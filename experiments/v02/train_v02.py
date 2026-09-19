@@ -89,11 +89,21 @@ def main():
     p.add_argument("--lam", type=float, default=1.0,
                    help="weight of the identity term (raise it to expose the "
                         "degenerate optimum of the naive penalty)")
+    p.add_argument("--deterministic", action="store_true",
+                   help="force a single CPU thread so that two runs with the same "
+                        "seeds are bit-identical.  The numbers reported in "
+                        "experiment_results.md were produced WITHOUT this flag: "
+                        "torch CPU reduction order shifts the last digits between "
+                        "runs (see PROTOCOL_V02.md section 8).  Effects reported "
+                        "here are 3-4x, not marginal, so the shift does not change "
+                        "any conclusion.")
     p.add_argument("--eval-episodes", type=int, default=192)
     p.add_argument("--only", type=str, default="",
                    help="restrict to one world (for the identity-loss ablation)")
     p.add_argument("--verbose", action="store_true")
     args = p.parse_args()
+    if args.deterministic:
+        torch.set_num_threads(1)
     seeds = [int(s) for s in args.seeds.split(",")]
     worlds = (args.only,) if args.only else WORLDS
 
@@ -114,6 +124,11 @@ def main():
             per_seed = []
             for seed in seeds:
                 dim = args.latent_dim if agent_name != "NoLatent" else 0
+                # seed BEFORE construction: otherwise the initial weights come
+                # from an unseeded global RNG and two runs with the same seed
+                # still differ (a real reproducibility bug, caught by the
+                # --deterministic check).
+                torch.manual_seed(seed)
                 model = AGENTS[agent_name](world.obs_dim, dim, world.n_candidates,
                                            world.n_horizons)
                 train(world, model, iters=args.iters, batch=args.batch, seq=args.seq,

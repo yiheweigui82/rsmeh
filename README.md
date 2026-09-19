@@ -67,15 +67,17 @@ D self_coupled_white       0.1829   -0.0001    -0.0002    0.004     0.012    0.9
 E false_agency             0.2483   -0.0008    -0.0014      n/a       n/a    0.956   0.005
 ```
 
-### 黑箱原型（`experiments/prototype/train.py`，1500 iters × 3 seeds）
+### 黑箱原型（`experiments/prototype/train.py --iters 1500 --seeds 1,2,3 --deterministic`）
 
 ```
 world                   predErr  baseErr  selfGain  selfShare  gainAbl alignSelf alignExtH  attrSelf  attrExt
-A_simple                 0.0001   0.0001    0.0000     0.0004   0.0005       n/a       n/a       n/a    1.000
-B_complex_external       0.0462   0.0641    0.0179     0.0092   0.3453       n/a     0.717       n/a    1.000
-C_self_relevant          0.0396   0.0562    0.0166     0.0020   2.5726     0.839       n/a     1.000    1.000
-D_false_agency           0.1102   0.1104    0.0002     0.0002   0.0150       n/a       n/a       n/a    1.000
+A_simple                 0.0001   0.0001    0.0000     0.0004   0.0006       n/a       n/a       n/a    1.000
+B_complex_external       0.0461   0.0641    0.0180     0.0093   0.3085       n/a     0.724       n/a    1.000
+C_self_relevant          0.0393   0.0562    0.0169     0.0020   2.4055     0.841       n/a     1.000    1.000
+D_false_agency           0.1102   0.1104    0.0002     0.0002   0.0090       n/a       n/a       n/a    1.000
 ```
+
+（`--deterministic` = 单线程，位级可复现；v0.2 侧同理。）
 
 ### 三条结论（两个实验方向一致）
 

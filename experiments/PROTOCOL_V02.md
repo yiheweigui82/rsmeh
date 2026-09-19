@@ -132,7 +132,28 @@ own actions.
   "temporal **self**" would then be unjustified (this is the analogue of v0.1's
   alignment-vs-self failure, and is the most likely outcome — see results).
 
-## 7. What v0.2 does NOT do
+## 7. Reproducibility
+
+```bash
+python experiments/v02/train_v02.py --iters 1200 --seeds 1,2,3                 # as reported
+python experiments/v02/train_v02.py --iters 1200 --seeds 1,2,3 --deterministic  # bit-identical re-runs
+python experiments/v02/train_v02.py --only T1_self_persistent --identity-loss naive --lam 20
+python experiments/v02/analysis/identity_test.py --world T1_self_persistent
+python experiments/v02/analysis/counterfactual_test.py
+```
+
+PyTorch CPU training is **not bit-reproducible by default**: reduction order across
+threads shifts the last digits between runs (we measured one row moving from
+`errH1` 0.2939 to 0.3445 at 25 iterations). `--deterministic` pins a single thread
+to get bit-identical re-runs. The numbers in `experiment_results.md` were produced
+**without** that flag; every reported effect is a factor of 3–4 (e.g. `errH10`
+0.538 vs 1.857), so the thread-order noise does not affect any conclusion.
+`identity_test.py` / `counterfactual_test.py` are likewise deterministic given
+their seeds.
+
+---
+
+## 8. What v0.2 does NOT do
 
 - **No recursion.** "I predict myself predicting" (Stage 5) is v0.3. v0.2 only
   tests continuity and counterfactual self-modelling.

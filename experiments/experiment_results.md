@@ -79,8 +79,13 @@ Full protocol, judgement criteria and falsification conditions:
 ## 2. Black-box prototype — `prototype/train.py`
 
 ```bash
-python experiments/prototype/train.py --iters 1500 --seeds 1,2,3
+python experiments/prototype/train.py --iters 1500 --seeds 1,2,3 --deterministic
 ```
+
+(`--deterministic` pins a single CPU thread, so this table is bit-reproducible.
+It also includes the fix for a real seeding bug: the model must be constructed
+*after* `torch.manual_seed`, otherwise the initial weights come from an unseeded
+global RNG and two runs with the same seed disagree.)
 
 ```
 === RSMEH prototype v0.1 -- latent self-information emergence ===
@@ -93,10 +98,10 @@ worlds:
   D_false_agency         high error, but actions have no effect and nothing is trackable
 
 world                   predErr  baseErr  selfGain  selfShare  gainAbl alignSelf alignExtH  attrSelf  attrExt
-A_simple                 0.0001   0.0001    0.0000     0.0004   0.0005       n/a       n/a       n/a    1.000
-B_complex_external       0.0462   0.0641    0.0179     0.0092   0.3453       n/a     0.717       n/a    1.000
-C_self_relevant          0.0396   0.0562    0.0166     0.0020   2.5726     0.839       n/a     1.000    1.000
-D_false_agency           0.1102   0.1104    0.0002     0.0002   0.0150       n/a       n/a       n/a    1.000
+A_simple                 0.0001   0.0001    0.0000     0.0004   0.0006       n/a       n/a       n/a    1.000
+B_complex_external       0.0461   0.0641    0.0180     0.0093   0.3085       n/a     0.724       n/a    1.000
+C_self_relevant          0.0393   0.0562    0.0169     0.0020   2.4055     0.841       n/a     1.000    1.000
+D_false_agency           0.1102   0.1104    0.0002     0.0002   0.0090       n/a       n/a       n/a    1.000
 ```
 
 ### Reading

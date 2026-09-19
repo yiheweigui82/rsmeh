@@ -488,14 +488,15 @@ in C the floor is white + whatever part of the agent's own drift it fails to tra
 An independent design (PyTorch; encoder → latent → decoder; the agent is never
 told it has an internal state, and the latent's only self-referential inputs are
 its own action and its own error). Reproduce with
-`python experiments/prototype/train.py --iters 1500 --seeds 1,2,3`:
+`python experiments/prototype/train.py --iters 1500 --seeds 1,2,3 --deterministic`
+(`--deterministic` pins one CPU thread so the table is bit-reproducible):
 
 ```
 world                   predErr  baseErr  selfGain  selfShare  gainAbl alignSelf alignExtH  attrSelf  attrExt
-A_simple                 0.0001   0.0001    0.0000     0.0004   0.0005       n/a       n/a       n/a    1.000
-B_complex_external       0.0462   0.0641    0.0179     0.0092   0.3453       n/a     0.717       n/a    1.000
-C_self_relevant          0.0396   0.0562    0.0166     0.0020   2.5726     0.839       n/a     1.000    1.000
-D_false_agency           0.1102   0.1104    0.0002     0.0002   0.0150       n/a       n/a       n/a    1.000
+A_simple                 0.0001   0.0001    0.0000     0.0004   0.0006       n/a       n/a       n/a    1.000
+B_complex_external       0.0461   0.0641    0.0180     0.0093   0.3085       n/a     0.724       n/a    1.000
+C_self_relevant          0.0393   0.0562    0.0169     0.0020   2.4055     0.841       n/a     1.000    1.000
+D_false_agency           0.1102   0.1104    0.0002     0.0002   0.0090       n/a       n/a       n/a    1.000
 ```
 
 Two findings matter here:
@@ -525,6 +526,55 @@ measured cleanly is its precondition — the self-caused quantity has temporal
 structure and hence is modellable in C (`selfEnc` 0.900) and is not in D (0.004).
 A metric that separates self-reference from world-memory remains an open problem
 (`../theory/QUESTIONS.md`, B2/B4).
+
+### 9.4 v0.2 — temporal continuity: does the self persist, and does persistence mean self?
+
+v0.1's negative result was that a representation of a hidden variable is not a
+representation of the self. v0.2 pushes along the time axis: is there a
+representation that stays **continuous across time**, and does that continuity
+belong to the *self* or merely to *persistence*? Full protocol and verdict
+criteria: `experiments/PROTOCOL_V02.md`; code: `experiments/v02/`.
+
+Three worlds with identical statistics and one causal difference — whether the
+agent's own action moves the hidden variable:
+
+| world | hidden variable | my action moves it? | `errH10`, persistent latent vs no persistence |
+|---|---|---|---|
+| **T1** | the agent's own state (AR 0.92) | **yes** | **0.538 vs 1.857** (gain +2.30 vs +0.98) |
+| **T2** | the agent's own state, variance-matched **white** | yes | 0.1139 vs 0.1135 (`info` 0.003) |
+| **T3** | a **world** drive with T1's exact AR dynamics | **no** | 0.4179 vs 0.4121 (**no gain**) |
+
+Findings:
+
+1. **Temporal continuity pays, but only for a self-caused, action-contingent
+   hidden state** (T1): the persistent latent cuts the ten-step error by 3.4× and
+   the counterfactual error from 0.233 to **0.117**. The latent that emerges is
+   simultaneously continuous and informative (`sep` 0.716, `info` 0.929), i.e. it
+   passes an anti-degenerate test — continuity numbers alone are worthless
+   because a *constant* latent scores perfectly on them (§9.5).
+2. **A persistent hidden cause is not sufficient** (T3): same dynamics, same
+   inobservability, same effect on outcomes — no continuity gain, no
+   counterfactual gain.
+3. **The agent-side evidence cannot decide the question.** In T1 the true
+   counterfactual divergence of the hidden variable (action +1 vs −1, same
+   exogenous noise) accumulates 0.50 → 3.54; in T3 it is **exactly zero**. That
+   difference lives in the *causal graph*, not in anything the agent can observe.
+   Any purely behavioural verdict on "is this representation a self?" is
+   therefore under-determined — the v0.2 analogue, and the sharpest form, of
+   v0.1's alignment failure.
+
+### 9.5 Two of our own corrections, reported as measured
+
+- We criticised the draft v0.2 identity loss `L = ‖z_t − z_{t−1}‖` for having a
+  degenerate optimum `z ≡ const`. The argument is sound (a constant latent is
+  ranked *first* by the naive continuity metric), but **we could not exhibit the
+  collapse**: even at λ = 20 the latent keeps `info` 0.942 while its drift falls
+  to 0.065. The danger is regime-dependent, and the measured case for the
+  contrastive objective is sharper identity (`sep` 0.950 vs 0.677) at no
+  prediction cost — not "the naive loss dies".
+- A real reproducibility bug was found by our own verification: the model was
+  constructed *before* `torch.manual_seed`, so identical seeds produced different
+  initial weights. Fixed; `--deterministic` now yields bit-identical re-runs.
 
 ---
 

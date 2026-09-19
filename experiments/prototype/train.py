@@ -36,11 +36,16 @@ def main():
     p.add_argument("--seeds", type=str, default="1,2,3")
     p.add_argument("--eval-episodes", type=int, default=256)
     p.add_argument("--verbose", action="store_true")
+    p.add_argument("--deterministic", action="store_true",
+                   help="pin a single CPU thread for bit-identical re-runs")
     args = p.parse_args()
 
     import torch  # noqa: F401  (imported here so --help works without torch)
 
     from agent.self_detector import train
+
+    if args.deterministic:
+        torch.set_num_threads(1)
 
     seeds = [int(s) for s in args.seeds.split(",")]
     print("=== RSMEH prototype v0.1 -- latent self-information emergence ===")
@@ -56,6 +61,9 @@ def main():
         per_seed = []
         for seed in seeds:
             world = World(name, seed=seed)
+            # seed BEFORE construction: the initial weights must not come from an
+            # unseeded global RNG, or two runs with the same seed differ.
+            torch.manual_seed(seed)
             model = PredictiveAgent(world.obs_dim, args.latent_dim)
             train(world, model, iters=args.iters, batch=args.batch, seq=args.seq,
                   lr=args.lr, seed=seed, verbose=args.verbose)
