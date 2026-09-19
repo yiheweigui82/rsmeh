@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0A0A0A">
+<title>递归自我模型涌现假说 · Recursive Self Model Emergence Hypothesis</title>
+<style>
+  :root { --bg:#0A0A0A; --card:#141414; --line:#262626; --gold:#F5C518; --fg:#EDEDED; --dim:#9A9A9A; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+         font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+         line-height:1.7; }
+  .wrap { max-width:860px; margin:0 auto; padding:56px 22px 80px; }
+  .tag { display:inline-block; font-size:12px; letter-spacing:.14em; color:var(--gold);
+         border:1px solid var(--gold); border-radius:999px; padding:3px 12px; margin-bottom:22px; }
+  h1 { font-size:34px; line-height:1.3; margin:0 0 6px; letter-spacing:-.01em; }
+  h1 .en { display:block; font-size:16px; color:var(--dim); font-weight:400; margin-top:10px; letter-spacing:0; }
+  .lede { font-size:19px; margin:26px 0 10px; }
+  .lede b { color:var(--gold); }
+  .quote { border-left:3px solid var(--gold); padding:6px 0 6px 16px; color:var(--dim); font-size:15px; margin:22px 0; }
+  h2 { font-size:15px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase;
+       margin:46px 0 16px; font-weight:600; }
+  .cards { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:640px){ .cards { grid-template-columns:1fr; } h1{font-size:26px;} }
+  a.card { display:block; background:var(--card); border:1px solid var(--line); border-radius:12px;
+           padding:18px 18px 16px; text-decoration:none; color:var(--fg); transition:.16s; }
+  a.card:hover { border-color:var(--gold); transform:translateY(-2px); }
+  a.card .t { font-size:17px; font-weight:600; }
+  a.card .d { font-size:14px; color:var(--dim); margin-top:6px; }
+  a.card .k { font-size:11px; color:var(--gold); letter-spacing:.1em; }
+  table { width:100%; border-collapse:collapse; font-size:14px; margin-top:8px; }
+  th,td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); }
+  th { color:var(--dim); font-weight:600; font-size:12px; letter-spacing:.06em; }
+  pre { background:#111; border:1px solid var(--line); border-radius:10px; padding:14px 16px;
+        overflow-x:auto; font-size:13px; color:#D8D8D8; }
+  .note { font-size:13px; color:var(--dim); margin-top:14px; }
+  .foot { margin-top:56px; padding-top:20px; border-top:1px solid var(--line);
+          font-size:13px; color:var(--dim); }
+  a { color:var(--gold); }
+  .pulse { color:var(--fg); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="tag">v0.1 · HYPOTHESIS · NOT A THEORY</span>
+  <h1>递归自我模型涌现假说
+    <span class="en">Recursive Self Model Emergence Hypothesis (RSMEH)</span>
+  </h1>
+
+  <p class="lede">
+    生命最初预测世界；当世界无法解释所有误差时，生命开始预测自己；
+    当预测自己的过程<b>再次成为预测对象</b>，「我」便从模型中涌现。
+  </p>
+
+  <div class="quote">
+    一个发生学缺口：没人解释为什么一个本来没有「我」的系统，
+    会在某个条件下<b>被迫</b>产生「我」这个变量。<br>
+    <span style="font-size:13px">v0.1 —— 等实验跑出来再升级为 Theory。</span>
+  </div>
+
+  <h2>读什么</h2>
+  <div class="cards">
+    <a class="card" href="theory/THEORY.md">
+      <div class="k">理论 · 中文</div>
+      <div class="t">完整理论（从「为什么」到「道」）</div>
+      <div class="d">核心问题 · 定义 · 归因压力 · Stage 0–5 · 与既有理论对照 · SMP 形式化 · 边界与攻击面</div>
+    </a>
+    <a class="card" href="paper/main.md">
+      <div class="k">PAPER · ENGLISH</div>
+      <div class="t">学术论文正文</div>
+      <div class="d">Abstract · 最小形式化 · 三情形分解 · 实验方案与结果 · 参考文献</div>
+    </a>
+    <a class="card" href="experiments/PROTOCOL.md">
+      <div class="k">PROTOCOL</div>
+      <div class="t">实验协议与判定标准</div>
+      <div class="d">条件 A/B/C · 四个指标 · 什么算支持、什么算证伪 · 防作弊规则 · 我们踩过的坑</div>
+    </a>
+    <a class="card" href="theory/QUESTIONS.md">
+      <div class="k">OPEN QUESTIONS</div>
+      <div class="t">攻击面清单</div>
+      <div class="d">概念 · 实验 · 理论关系 · 哲学 —— 欢迎逐条来拆</div>
+    </a>
+    <a class="card" href="experiments/code/simulation.py">
+      <div class="k">CODE · NUMPY</div>
+      <div class="t">可运行 toy 实验</div>
+      <div class="d">纯 NumPy 零依赖，含 BPTT 梯度检查（对照有限差分 ~1e-7）</div>
+    </a>
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh">
+      <div class="k">GITHUB</div>
+      <div class="t">仓库 · 提 issue / PR</div>
+      <div class="d">最有价值的贡献：让判定标准失败的实验</div>
+    </a>
+  </div>
+
+  <h2>核心预测（最容易被打倒的地方）</h2>
+  <table>
+    <tr><th>条件</th><th>环境</th><th>预测</th></tr>
+    <tr><td><b>A</b> 纯预测</td><td>低维世界，误差可被世界模型完全消除</td><td>不产生自我模型</td></tr>
+    <tr><td><b>B</b> 外部复杂度</td><td>高维世界 + 不可归约的<b>外部</b>噪声</td><td>长出更大的世界模型；<b>不</b>产生自我模型</td></tr>
+    <tr><td><b>C</b> 自因不可归约误差</td><td>不可归约、且由系统<b>自身隐藏漂移</b>造成的误差</td><td>出现指向自身的隐结构（自我表征涌现）</td></tr>
+  </table>
+  <p class="note">关键不对称：<b>误差大</b>不等于<b>逼出自我</b>。B 的误差持续存在却属于世界，因此不驱动自我建模。
+  「自我」不能用架构位置定义，只能用因果作用定义（消融实验）。</p>
+
+  <h2>一句话立场</h2>
+  <p>
+    「我」不是灵魂实体、不是固定物质、不是中央控制者，而是<b>一个预测系统为了理解自身在世界中的因果位置
+    而产生的递归模型结构</b>。若「道」是宇宙整体运行，那么「我」不是道之外的东西——
+    而是道在局部系统中形成的一次递归自解释。海浪不是海之外的存在，但浪可以暂时形成：「我是一个浪」。
+  </p>
+
+  <div class="foot">
+    <p>署名：仇小昌 (Chou Xiaochang) ｜ 仓库：<a href="https://github.com/yiheweigui82/rsmeh">yiheweigui82/rsmeh</a> ｜ 许可：CC BY 4.0</p>
+    <p>姊妹项目：<a href="https://github.com/yiheweigui82/bug-hypothesis-of-consciousness">意识 Bug 假说 / The Consciousness Bug Hypothesis</a></p>
+    <p><i>The goal is not to prove the idea. The goal is to find out whether it survives attempts to break it.</i></p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,2 @@
+# RSMEH toy simulation — NumPy only, nothing else is required.
+numpy>=1.24

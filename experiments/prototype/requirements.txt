@@ -1,0 +1,13 @@
+# Prototype requirements
+#
+#   pip install -r experiments/prototype/requirements.txt
+#
+# Then:  python experiments/prototype/train.py
+#
+# PyTorch CPU wheels are sufficient; no GPU is used.  matplotlib is needed only
+# for visualize.py.  The protocolled experiment in ../code/simulation.py needs
+# nothing but NumPy.
+
+torch>=2.0
+numpy>=1.24
+matplotlib>=3.7
