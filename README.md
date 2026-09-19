@@ -12,7 +12,8 @@ of itself — and then a model of *that* model?
 > **状态：v0.1 — 假说，不是理论。**
 > 等实验跑出来（并经受住复现），再升级为 **RSMEH Theory**。第一版可运行 toy 实验已跑通，结果见下方「实际跑出来的数据」。
 
-> **进度**：v0.1（自因误差 → 自我表征）✅ 已跑通 ｜ **v0.2（时间连续自我）✅ 已跑通**，见 `experiments/PROTOCOL_V02.md` 与 `experiments/experiment_results.md` §5–§9 ｜ v0.3（递归自我：我预测我的预测）⬜ 未开始。
+> **进度**：v0.1（自因误差 → 自我表征）✅ ｜ **v0.2（时间连续自我）✅** ｜ **v0.3（递归预测：我预测我将怎么预测）✅ 已跑通** ——三版全部附 verbatim 实测输出与判定状态：
+> `experiments/experiment_results.md` §5–§9（v0.2）、§10–§12（v0.3）；协议 `PROTOCOL.md` / `PROTOCOL_V02.md` / `PROTOCOL_V03.md`。
 
 ---
 
@@ -108,6 +109,27 @@ T3_external_persistent  NoPersist   0.0197  0.1797  0.4121   0.628  0.555  0.434
 
 （含一处公开的**自我纠正**：我们批评草稿的身份损失会退化成常量解，数学上成立但**没能做出来**——λ=20 时 latent 仍保有 `info`=0.942。详见 `experiment_results.md` §6。）
 
+### v0.3 实测：递归预测（`experiments/v03/train_v03.py`，900 iters × 3 seeds）
+
+```
+world                 agent         worldErr  vacuousR2  selfPred  trivial  selfR2fut   incrR2  gainInfo
+R1_prediction_loop    Rec              0.068      0.956     0.155    0.102      0.948    0.003     0.286
+R1_prediction_loop    NoSelfPred       0.061      0.949       n/a    0.082      0.934    0.001     0.300
+R1_prediction_loop    NoRec            0.069      0.983     0.091    0.095      0.971    0.002     0.326
+R2_exogenous_control  Rec              0.040      0.968     0.052    0.030      0.781    0.017       n/a
+R3_visible_response   Rec              0.036      0.998     0.024    0.028      0.993    0.002       n/a
+```
+
+**结论（本版是一次有明确机制的负面结果）**：
+
+1. **草稿的递归指标被实测证伪**：`vacuousR2 = R²(z→我此刻的预测)` 九个组合全部 0.949–1.000，而且**在「无递归」agent 上最高（0.983）**——它不可能失败，还给最不该得分的对象最高分。
+2. **二阶内容确实存在于 latent 里**：`selfR2fut = 0.948`，而时间打乱的 NULL 对照只有 **0.002** —— 探针是真的在测东西。
+3. **但它功能上是冗余的**：超出「我此刻的预测 + 观测 + 动作」的增量只有 **`incrR2 = 0.003`**；原因是 `R²(p_t → p_{t+1}) = 0.989` —— **我现在的预测已经包含了我对未来输入的最佳估计**，所以「预测我下一次怎么预测」≈「重复我现在的预测」。
+4. **闭环是成本，不是收益**：我的预测推动世界时，预测误差反而更差（R1 0.068 > R2 0.040）——自指会把建模误差**放大**回去。
+5. **二阶头是乘客**：去掉重训后世界预测不降反升（0.061 vs 0.068）；无持续性 agent 的二阶指标还更高。
+
+→ 在这套操作化下，**「预测自己的预测」不是独立的信息需求，而是被第一阶预测吸收了**。协议 §8 写明了本版**不主张**什么，并给出「递归要有非冗余价值」所需的三个条件（供 v0.4 攻击）。
+
 ### 实测图（`experiments/prototype/visualize.py`）
 
 | 世界 C：latent ↔ agent **自身**隐藏状态 | 世界 B：latent ↔ 隐藏的**外部**驱动 |
@@ -144,6 +166,16 @@ T3_external_persistent  NoPersist   0.0197  0.1797  0.4121   0.628  0.555  0.434
 | `experiments/v02/agent/` | `Memory` / `NoPersist`（无持续性对照）/ `NoLatent` + 反退化指标模块 |
 | `experiments/v02/train_v02.py` | v0.2 主实验（含身份损失 `none/naive/contrastive` 消融） |
 | `experiments/v02/analysis/` | `identity_test.py`（含「死的 latent」对照）/ `counterfactual_test.py`（反事实分支） |
+
+### v0.3 追加
+
+| 路径 | 内容 |
+|------|------|
+| `experiments/PROTOCOL_V03.md` | v0.3 协议：递归预测假说、三个世界 R1/R2/R3、五处草稿修正、四条判定标准与本版**不主张**什么 |
+| `experiments/v03/environment/` | R1 预测反馈闭环（隐藏漂移增益）/ R2 **置换**对照（分布严格相同、非我造成）/ R3 可见常数响应 |
+| `experiments/v03/agent/` | `Rec` / `NoSelfPred`（去二阶头重训）/ `NoRec`（无持续性）+ 指标模块（含草稿那个恒亮指标，故意留着） |
+| `experiments/v03/train_v03.py` | 主入口：世界与 agent **逐步交织**（因果闭环），BPTT 覆盖整段 episode |
+| `experiments/v03/analysis/recursion_test.py` | 修好的递归测试：未来预测探针 + **NULL 对照** + `loop check`（世界对我的预测的响应是否可学） |
 
 ## 快速跑通
 

@@ -16,6 +16,7 @@
 | **受控对照实验**（主干） | `code/simulation.py` | 同一架构、5 个条件（A/B/C/D/E），**因果消融 + 归因读出 + 自编码探针** | 强：有因果控制，能区分「自因」与「外因」 |
 | **黑箱涌现原型**（教学/社区友好） | `prototype/` | encoder→latent→decoder，4 个世界（A/B/C/D），**训练时完全不知道 Self 存在** | 弱（指标易被冗余路径污染），但更贴近社区直觉 |
 | **v0.2 时间连续自我** | `v02/` | 三个世界 T1/T2/T3（统计量相同、只差因果位置）× 三个状态载体（持久 latent / 无持续性 / 无 latent），**分层预测 + 反事实分支** | 强：能区分「属于自我的持久性」与「属于世界的持久性」 |
+| **v0.3 递归预测** | `v03/` | 三个世界 R1/R2/R3（闭环 / **置换**对照 / 可见响应）× `Rec`/`NoSelfPred`/`NoRec`，**二阶探针 + NULL 对照** | 强：直接检验「预测自己的预测」是否有**非冗余**价值（本版结论为否定，见 §12） |
 
 两者**互相验证**：受控实验的条件 D 与原型的世界 D 给出同一个结论——
 **误差越大 ≠ 逼出自我**。
@@ -28,6 +29,9 @@ python experiments/prototype/train.py --iters 1500 --seeds 1,2,3
 python experiments/v02/train_v02.py --iters 1200 --seeds 1,2,3          # v0.2
 python experiments/v02/analysis/identity_test.py --world T1_self_persistent
 python experiments/v02/analysis/counterfactual_test.py
+python experiments/v03/train_v03.py --iters 900 --seeds 1,2,3               # v0.3
+python experiments/v03/analysis/recursion_test.py --world R1_prediction_loop
+python experiments/v03/analysis/recursion_test.py --world R2_exogenous_control
 ```
 
 实测输出与解读：**`experiment_results.md`**。
