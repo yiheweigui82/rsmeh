@@ -252,6 +252,20 @@ python experiments/v05/compare_reality.py                          # shared vs d
 
 受控实验**零依赖**（只用 NumPy）；原型需要 PyTorch（CPU 版够用）。环境：Python 3.11。
 
+## 验证（Tests）
+
+```bash
+python -m unittest discover -s tests -v      # 18 tests, ~19 s, 仅标准库
+```
+
+没有 CI 配置；测试用 stdlib `unittest`（只依赖 NumPy / PyTorch，与实验一致）。它们锁住的是**文档里写明的声明**，
+不是「代码能跑」——断言一破，就是某条声称破：
+
+| 测试文件 | 锁住什么 |
+|---|---|
+| `tests/test_plastic_self.py` | v0.4 的**三条设计条件**（隐藏调制器影响我的**未来**、不影响我**此刻**、拆掉快通路后完全无关）、世界模式语义（`static` 的 m≡0、`visible` 暴露 m）、快权重**不发散**（初版 40 步内 1e17）、常量目标不给分、以及一次短训练必须复现「二阶头赢过平凡基线 + `mInfo` 超过地板」 |
+| `tests/test_multi_embodiment.py` | v0.5 的宇宙结构（`shared` 一个共同因 / `disjoint` 无）、**没有任何具身直接观测共享隐因子**、CCA 落在 [0,1]、误差 helper 按时间对齐（展平顺序那个坑 = 16/9 精确值）、以及 `shared` 对齐 / `disjoint` 不对齐的证伪对照 |
+
 ## 与《意识 Bug 假说》的关系
 
 同源不同问。两者共享一根引信：**「我」可能不是能力，而是债务。**
