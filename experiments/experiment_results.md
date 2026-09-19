@@ -705,3 +705,114 @@ generative process**, i.e. by construction; the experiment therefore cannot spea
 about the real world at all — it can only demonstrate what "many projections of
 one thing" looks like computationally (an alignable core plus unshareable private
 content). The 道德经 appendix is labelled as an interpretation, not a result.
+
+---
+
+# v0.4 — Plastic Self (the v0.3 repair)
+
+## 17. Main table — `python experiments/v04/train_v04.py --iters 800 --seeds 1,2,3`
+
+```
+=== RSMEH v0.4 -- Plastic Self (the v0.3 repair) ===
+latent 32-dim | iters 800 | seeds [1, 2, 3] | lambda_self 1.0
+
+  the hidden modulator enters ONLY the fast-weight update rule -- never
+  the encoder, the latent or the prediction path.
+
+  plastic  the agent's own plasticity drifts (hidden AR(1) modulator) -- unobservable, only its consequences are visible
+  static   m == 0: no hidden plasticity at all  [the falsifier]
+  visible  the modulator is appended to the observation  [readable self]
+
+world    agent       worldErr selfPred  trivial selfR2fut  incrR2 incrNull   mInfo  mNull
+plastic  Plastic        0.529    0.019    0.168     0.756   0.072    0.002   0.081  0.005
+plastic  NoFast         0.392    0.008    0.160     0.845   0.043    0.001   0.004  0.005
+plastic  NoSelfPred     0.654      n/a    0.174     0.735   0.158    0.002   0.050  0.005
+
+static   Plastic        0.493    0.012    0.166     0.856   0.050    0.001     n/a    n/a
+static   NoFast         0.409    0.010    0.187     0.834   0.040    0.001     n/a    n/a
+static   NoSelfPred     0.448      n/a    0.165     0.762   0.069    0.001     n/a    n/a
+
+visible  Plastic        0.507    0.012    0.167     0.806   0.088    0.001   0.993  0.005
+visible  NoFast         0.409    0.008    0.175     0.850   0.037    0.001   0.982  0.005
+visible  NoSelfPred     0.484      n/a    0.178     0.784   0.079    0.002   0.981  0.005
+```
+
+## 18. Reading — what the repair actually achieved
+
+**1. The self-quantity is now genuinely non-redundant, and the system estimates
+it.** This is the cleanest new evidence in the whole repository:
+
+| condition | `mInfo` (latent → my own plasticity) |
+|---|---|
+| `visible` — the modulator is an input | **0.993** (free: it is in the observation) |
+| `plastic` — hidden, must be inferred from my own errors | **0.081** |
+| NULL (latent shuffled in time) | 0.005 |
+| `plastic` + `NoFast` — no plastic pathway, so no channel exists | **0.004** |
+
+Monotone, causally interpretable, and with its own floor: the agent estimates a
+hidden property of *itself*, the estimate vanishes exactly when the pathway that
+makes it relevant is removed, and it is free when the property is observable.
+
+**2. The second-order head finally beats its bar.** `selfPred` = 0.019 vs
+`trivial` = 0.168 (a 9× margin). In v0.3 the head **lost** (0.155 vs 0.102).
+
+**3. The redundancy is broken, twenty-four-fold.** `incrR2` = **0.072** (v0.3:
+**0.003**), against a NULL of 0.002. And the modulator's *own* contribution
+separates cleanly: `incrR2(plastic) − incrR2(static)` = **+0.022** for the plastic
+agent vs **+0.003** for `NoFast` — i.e. the extra non-redundant information only
+appears when the agent actually has the plastic pathway that `m_t` modulates.
+
+## 19. v0.4 conclusion, the prediction we got wrong, and what still fails
+
+| criterion (`PROTOCOL_V04.md` §6) | status |
+|---|---|
+| C1 `incrR2` ≫ v0.3's 0.003 and ≫ NULL | **accepted** — 0.072 vs 0.003 / NULL 0.002 |
+| C2 `selfPred < trivial` | **accepted** — 0.019 < 0.168 (the project's first win) |
+| C3 `mInfo ≫ mNull`; `n/a` in `static` | **accepted** — 0.081 vs 0.005 |
+| C4 causal controls (`NoFast` loses the effect; `static` < `plastic`) | **accepted** — `NoFast` mInfo 0.004 ≈ NULL and a +0.003 vs +0.022 increment gap |
+| C5 `visible` should need no inference, so `incrR2` should fall back | **REFUTED BY THE DATA** — `visible` gives `incrR2` 0.088, *higher* than `plastic`'s 0.072 |
+
+**The prediction we got wrong, and what it teaches.** C5 assumed that once the
+modulator is an input, the linear controls `(p_t, x_t, a_t)` would absorb it and
+the latent's incremental value would drop. It did not. The reason is that the
+modulator's effect on my next prediction is **multiplicative** (`g_t` scales
+`err_t·φ(x_t)ᵀ`), so a linear probe cannot capture it from the raw value while the
+latent — a nonlinear function of the history — still can. Consequence: **`incrR2`
+is not a clean measure of self-inference**; it measures "the latent knows
+something the linear controls do not", which includes nonlinear interactions. The
+discriminating probe is `mInfo`, not `incrR2`. (This also means v0.3's
+`incrR2` ≈ 0.003 should be read as "no incremental linear information", which the
+0.989 trivial-bar corroborated, rather than as a general proof of redundancy.)
+
+**What still fails — stated plainly.**
+
+1. **The self is not the only source of non-redundancy.** Even with no modulator
+   (`static`) and no plasticity (`NoFast`), `incrR2` sits at 0.040–0.050, because
+   the world's own regime switching must also be inferred from errors. Only the
+   *difference* `plastic − static` (+0.022) is attributable to the self.
+2. **Plasticity does not pay for itself here.** World prediction is *better*
+   without the fast pathway (`NoFast` 0.392 vs `Plastic` 0.529), and the hidden
+   modulator makes the world task harder still (`static` 0.493 vs `plastic`
+   0.529). So v0.4 shows that a non-redundant, inferred self-quantity **exists and
+   is estimated** — not that it is *useful*.
+3. **Removing the second-order head *raises* the probed `incrR2`** (0.158 vs
+   0.072). `incrR2` is a probe on the latent, not a measure of what the head
+   does; the head's value must be read from `selfPred`. Reported because it would
+   have been easy to present the 0.158 as a success.
+
+**Net verdict.** v0.3's specific failure is repaired: the second-order target is
+no longer a copy of the first-order one (0.003 → 0.072), the head finally beats the
+trivial predictor, and the system demonstrably estimates **its own plasticity** —
+a hidden property of itself, recovered from its own error history alone
+(0.081 vs 0.004 when the pathway is removed). What is *not* shown is that this
+costs out: the plastic pathway is a net cost to world prediction, and the world's
+own hidden regime supplies a comparable non-redundant channel. The isolation
+experiment is named for v0.6: a **stationary** world plus a per-episode hidden
+constant (so the only unobservable thing left is me), and a capacity-limited slow
+path (so in-context adaptation *must* go through the fast pathway).
+
+**One engineering note for the record.** The first version of the fast-weight
+pathway diverged (1e17 by iteration 40): my error rewrote my memory, which changed
+my next error — a positive feedback loop that is also a nice illustration of why
+self-reference is a *cost* (v0.3's `worldErr` result). It is stabilised by
+normalised retrieval (`Fφ/(‖φ‖²+1)`) and bounded storage (`tanh(err)`).

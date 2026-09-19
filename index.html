@@ -132,6 +132,16 @@
       <div class="t">现实比较实验</div>
       <div class="d"><code>universe.py</code> 共享隐因子 · 三种传感器接口 · <code>compare_reality.py</code>（CCA / 留出翻译 / 隐藏因子恢复）</div>
     </a>
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/blob/main/experiments/PROTOCOL_V04.md">
+      <div class="k">V0.4 · 可塑性自我</div>
+      <div class="t">v0.3 的补课：让二阶目标真的非冗余</div>
+      <div class="d">隐藏的学习率调制器只进入快权重更新 · plastic / static / visible 三世界 + <code>NoFast</code> 因果对照</div>
+    </a>
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/tree/main/experiments/v04">
+      <div class="k">V0.4 · CODE</div>
+      <div class="t">可塑性自我实验</div>
+      <div class="d"><code>plastic_world.py</code> · <code>plastic_agent.py</code>（慢权重 + 快权重 + 二阶头）· <code>plastic_metrics.py</code>（含 <code>mInfo</code>）</div>
+    </a>
     <a class="card" href="https://github.com/yiheweigui82/rsmeh">
       <div class="k">GITHUB</div>
       <div class="t">仓库 · 提 issue / PR</div>
@@ -190,6 +200,25 @@
   <b>方法论</b>：明显的 CCA 指标<b>不干净</b>——无共同因时它仍有 ~0.3 的地板（两个 latent 都编码了同类自相关结构）；
   能通过证伪检验的是<b>留出翻译</b>。<b>对齐 ≠ 共享</b>，与前几版同构（连续 ≠ 自我、可解码 ≠ 在使用、二阶内容 ≠ 二阶需求）。<br>
   <b>本实验不能</b>说明客观现实不存在、意识涌现、或 AI 有体验：这里的「现实」由构造定义为隐生成过程。</p>
+
+  <h2>v0.4：可塑性自我（v0.3 的补课 · 已跑通）</h2>
+  <p class="note">v0.3 的诚实结论是「二阶目标冗余」（<code>incrR2</code>=0.003）。v0.4 的做法：让<b>我自己的学习率</b>被一个
+  <b>隐藏的 AR(1) 调制器</b>驱动——它<b>只进入快权重更新规则</b>，从不进入编码器 / latent / 预测通路。于是它同时满足
+  (a) 影响我<b>未来</b>的计算、(b) 不影响我<b>此刻</b>的输出、(c) 不可观测 ⇒ 只有我自己的误差史能揭示它。</p>
+  <table>
+    <tr><th>度量</th><th>v0.3</th><th>v0.4（隐藏可塑性）</th><th>拆掉快通路</th><th>可观测时</th><th>NULL</th></tr>
+    <tr><td><code>incrR2</code>（二阶目标的<b>非冗余</b>增量）</td><td>0.003</td><td><b>0.072</b></td><td>0.043</td><td>0.088</td><td>0.002</td></tr>
+    <tr><td>二阶头 vs 平凡基线</td><td>0.155 vs 0.102（<b>输</b>）</td><td><b>0.019 vs 0.168（赢 9 倍）</b></td><td>0.008 vs 0.160</td><td>0.012 vs 0.167</td><td>–</td></tr>
+    <tr><td><code>mInfo</code>（latent → <b>我自己的可塑性</b>）</td><td>—</td><td><b>0.081</b></td><td><b>0.004</b>（无通道）</td><td><b>0.993</b>（免费）</td><td>0.005</td></tr>
+    <tr><td>世界预测误差</td><td>—</td><td>0.529</td><td><b>0.392</b>（更好）</td><td>0.507</td><td>–</td></tr>
+  </table>
+  <p class="note"><b>修复了什么</b>：冗余被打破 24 倍；二阶头<b>第一次赢</b>；系统确确实实在估计<b>自己的可塑性</b>
+  （隐藏 0.081 ｜ 拆掉快通路 0.004 ｜ 可观测 0.993 ｜ NULL 0.005 —— 单调且各自有地板）。<br>
+  <b>没证明什么</b>：可塑性在这里是<b>世界预测的净成本</b>（0.392 < 0.529）；世界自己的隐藏 regime 也贡献同量级非冗余信息
+  （<code>static</code> 下 <code>incrR2</code> 仍有 0.050）——只有 <code>plastic − static</code> 的 <b>+0.022</b> 能归因于自我。<br>
+  <b>我写错的一处预测也已公开</b>：我预测可观测时 <code>incrR2</code> 会回落，实测反而更高（0.088 &gt; 0.072）——
+  因为 <code>m_t</code> 的作用是<b>乘性</b>的，线性探针抓不住、非线性 latent 能抓住。所以 <b><code>incrR2</code> 不是干净的自我推断指标，
+  <code>mInfo</code> 才是</b>。</p>
 
   <h2>一句话立场</h2>
   <p>

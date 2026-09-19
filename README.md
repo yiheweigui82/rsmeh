@@ -16,6 +16,8 @@ of itself — and then a model of *that* model?
 > `experiments/experiment_results.md` §5–§9（v0.2）、§10–§12（v0.3）；协议 `PROTOCOL.md` / `PROTOCOL_V02.md` / `PROTOCOL_V03.md`。
 >
 > **v0.5（多具身现实模型）✅** ——不同感官接口下的内部现实：共享核心 + 不可共享的私有内容。见 `experiments/v05/`、`experiment_results.md` §14–§16、`experiments/v05/README.md`。
+>
+> **v0.4（可塑性自我 · v0.3 的补课）✅** ——隐藏的学习率调制器让「二阶目标」第一次真正非冗余。见 `experiments/v04/`、`experiment_results.md` §17–§19、`experiments/PROTOCOL_V04.md`。
 
 ---
 
@@ -146,6 +148,27 @@ R3_visible_response   Rec              0.036      0.998     0.024    0.028      
 5. **二阶头是乘客**：去掉重训后世界预测不降反升（0.061 vs 0.068）；无持续性 agent 的二阶指标还更高。
 
 → 在这套操作化下，**「预测自己的预测」不是独立的信息需求，而是被第一阶预测吸收了**。协议 §8 写明了本版**不主张**什么，并给出「递归要有非冗余价值」所需的三个条件（供 v0.4 攻击）。
+
+### v0.4 实测：可塑性自我（`experiments/v04/train_v04.py`，800 iters × 3 seeds）
+
+```
+world    agent       worldErr selfPred  trivial selfR2fut  incrR2 incrNull   mInfo  mNull
+plastic  Plastic        0.529    0.019    0.168     0.756   0.072    0.002   0.081  0.005
+plastic  NoFast         0.392    0.008    0.160     0.845   0.043    0.001   0.004  0.005
+static   Plastic        0.493    0.012    0.166     0.856   0.050    0.001     n/a    n/a
+visible  Plastic        0.507    0.012    0.167     0.806   0.088    0.001   0.993  0.005
+```
+
+**v0.3 的具体失败被修复**：
+
+1. **冗余被打破 24 倍**：`incrR2` **0.003 → 0.072**（NULL 0.002）。可归因于隐藏可塑性的部分是 `plastic − static` = **+0.022**，而拆掉快通路的 `NoFast` 只有 **+0.003**。
+2. **二阶头第一次赢过平凡基线**：0.019 vs 0.168（v0.3 里它是输的：0.155 vs 0.102）。
+3. **系统真的在估计自己的可塑性**：`mInfo` 阶梯 —— 隐藏（须从自己的误差史推断）**0.081** ｜ 拆掉快通路 **0.004** ｜ 时间打乱 NULL **0.005** ｜ 可观测时 **0.993**。
+
+**没被证明的是「划算」，以及一处我写错的预测**：
+
+- 可塑性在这里是**世界预测的净成本**（`NoFast` 0.392 < `Plastic` 0.529）；世界自己的隐藏 regime 也贡献同量级非冗余信息（`static` 下 `incrR2` 仍 0.050）。
+- 我预先写的 C5 预测（`visible` 下 `incrR2` 应回落到 `static` 水平）**被数据推翻**：0.088 > 0.072。原因是 `m_t` 的作用是**乘性**的，线性探针抓不住、非线性 latent 能抓住 —— 因此 **`incrR2` 不是干净的「自我推断」指标，`mInfo` 才是**。
 
 ### 实测图（`experiments/prototype/visualize.py`）
 

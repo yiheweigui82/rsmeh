@@ -18,6 +18,7 @@
 | **v0.2 时间连续自我** | `v02/` | 三个世界 T1/T2/T3（统计量相同、只差因果位置）× 三个状态载体（持久 latent / 无持续性 / 无 latent），**分层预测 + 反事实分支** | 强：能区分「属于自我的持久性」与「属于世界的持久性」 |
 | **v0.3 递归预测** | `v03/` | 三个世界 R1/R2/R3（闭环 / **置换**对照 / 可见响应）× `Rec`/`NoSelfPred`/`NoRec`，**二阶探针 + NULL 对照** | 强：直接检验「预测自己的预测」是否有**非冗余**价值（本版结论为否定，见 §12） |
 | **v0.5 多具身现实** | `v05/` | 一个宇宙（共享隐因子）× 三种感官接口 + `shared`/`disjoint`（无共同因）对照 + 同接口对照 | 强：能区分「共享现实」与「各自建模自己的世界」（CCA 不干净，留出翻译才是干净指标，见 §15） |
+| **v0.4 可塑性自我** | `v04/` | 慢权重 + **快权重**（在线可塑性）+ 二阶头；世界 `plastic`/`static`/`visible` × `Plastic`/`NoFast`/`NoSelfPred` | 强：隐藏的学习率调制器让二阶目标**非冗余**（`incrR2` 0.003→0.072），`mInfo` 直接测「系统估计自己的可塑性」（§17–§19） |
 
 两者**互相验证**：受控实验的条件 D 与原型的世界 D 给出同一个结论——
 **误差越大 ≠ 逼出自我**。
@@ -35,6 +36,8 @@ python experiments/v03/analysis/recursion_test.py --world R1_prediction_loop
 python experiments/v03/analysis/recursion_test.py --world R2_exogenous_control
 python experiments/v05/train_v05.py --iters 700 --seeds 1,2,3               # v0.5
 python experiments/v05/compare_reality.py
+python experiments/v04/train_v04.py --iters 800 --seeds 1,2,3               # v0.4
+python experiments/v04/train_v04.py --modes plastic,static --only Plastic --deterministic
 ```
 
 实测输出与解读：**`experiment_results.md`**。
