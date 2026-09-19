@@ -15,6 +15,7 @@
 |---|---|---|---|
 | **受控对照实验**（主干） | `code/simulation.py` | 同一架构、5 个条件（A/B/C/D/E），**因果消融 + 归因读出 + 自编码探针** | 强：有因果控制，能区分「自因」与「外因」 |
 | **黑箱涌现原型**（教学/社区友好） | `prototype/` | encoder→latent→decoder，4 个世界（A/B/C/D），**训练时完全不知道 Self 存在** | 弱（指标易被冗余路径污染），但更贴近社区直觉 |
+| **v0.2 时间连续自我** | `v02/` | 三个世界 T1/T2/T3（统计量相同、只差因果位置）× 三个状态载体（持久 latent / 无持续性 / 无 latent），**分层预测 + 反事实分支** | 强：能区分「属于自我的持久性」与「属于世界的持久性」 |
 
 两者**互相验证**：受控实验的条件 D 与原型的世界 D 给出同一个结论——
 **误差越大 ≠ 逼出自我**。
@@ -24,6 +25,9 @@
 ```bash
 python experiments/code/simulation.py --iters 3000 --seeds 1,2,3 --b-ablation
 python experiments/prototype/train.py --iters 1500 --seeds 1,2,3
+python experiments/v02/train_v02.py --iters 1200 --seeds 1,2,3          # v0.2
+python experiments/v02/analysis/identity_test.py --world T1_self_persistent
+python experiments/v02/analysis/counterfactual_test.py
 ```
 
 实测输出与解读：**`experiment_results.md`**。
@@ -176,3 +180,33 @@ Persistent Error  +  Self-Causal Relevance  +  Predictive Utility
 > The goal of this project is not to create artificial consciousness, but to investigate whether the computational conditions that produce a first-person self-model can emerge naturally from predictive systems.
 >
 > 本项目并非试图制造人工意识，而是探索：一个预测系统在什么计算条件下，会自然产生第一人称自我模型。
+
+---
+
+## 11. v0.2：时间连续自我（Temporal Self Continuity）
+
+v0.1 的负面结论是「latent 编码隐藏变量 ≠ 编码自我」。**v0.2 沿时间轴再问一次**：
+
+> 是否存在一个跨时间保持连续的表征？而这个连续性属于**自我**，还是只属于**持久性**？
+>
+> 假说：`past → me → future`。当系统必须解释**自己的过去如何约束自己的未来**时，
+> 稳定的自我表征作为跨时间的信息压缩结构出现。
+
+**三个世界（统计量完全相同，只差因果位置）**：
+
+| 世界 | 隐藏变量 | 动力学 | 我的动作能驱动它吗 | 实测 `gainH10`（持久 latent vs 无持续性） |
+|---|---|---|---|---|
+| **T1** | agent **自己的状态** | AR(0.92) | **能** | **+2.30 vs +0.98**（误差 0.538 vs 1.857） |
+| **T2** | agent 自己的状态，**白噪声**（方差匹配） | 无结构 | 能 | ±0.00（0.1139 vs 0.1135，`info`=0.003） |
+| **T3** | **属于世界的**隐藏驱动 | AR(0.92)，与 T1 完全相同 | **不能** | ±0.00（0.4179 vs 0.4121，无持续性反而略好） |
+
+**三条结论**：
+
+1. **时间连续性只在「自因 + 被我的动作驱动」时才付钱**（T1）。反事实预测误差随状态载体单调下降：0.282（无 latent）→ 0.233（无持续性）→ **0.117**（持久 latent）。
+2. **「存在一个持久的隐藏变量」不充分**（T3）：同样的 AR 动力学、同样的不可观测性、同样影响结果，**收益为零**。所以「时间连续自我」不是「持久隐藏变量」的换名。
+3. **最大的负面发现**：T1 与 T3 对智能体的**全部可观测证据完全对称**。真实分支差（我的动作是否推动我的状态）在 T1 是 0.50→3.54 累积，在 T3 **恒为 0.0000** —— 而这个差异**只存在于因果图里**，智能体看不见、也测不出。
+   → 任何**纯行为/纯表征**的「这是不是一个自我」判定，都被智能体可见的信息**欠定**。
+
+还有一条**自我纠正**：我们对草稿身份损失 `L=‖z_t−z_{t−1}‖` 的批评（会退化成常量解）在数学上成立，但**没能做出来**——λ=20 时 latent 依然保有 `info`=0.942（`drift`→0.065）。危险是**依赖参数区间**的；对比式目标的真正优势是身份更锐利（`sep` 0.950 vs 0.677–0.740）且预测零代价。
+
+完整协议见 `PROTOCOL_V02.md`，实测输出与判定状态见 `experiment_results.md` §5–§9，目录说明见 `v02/README.md`。

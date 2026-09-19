@@ -12,6 +12,8 @@ of itself — and then a model of *that* model?
 > **状态：v0.1 — 假说，不是理论。**
 > 等实验跑出来（并经受住复现），再升级为 **RSMEH Theory**。第一版可运行 toy 实验已跑通，结果见下方「实际跑出来的数据」。
 
+> **进度**：v0.1（自因误差 → 自我表征）✅ 已跑通 ｜ **v0.2（时间连续自我）✅ 已跑通**，见 `experiments/PROTOCOL_V02.md` 与 `experiments/experiment_results.md` §5–§9 ｜ v0.3（递归自我：我预测我的预测）⬜ 未开始。
+
 ---
 
 ## 在线阅读（推荐）
@@ -83,6 +85,27 @@ D_false_agency           0.1102   0.1104    0.0002     0.0002   0.0150       n/a
 
 完整协议、判定标准、证伪条件、以及我们踩过的三条方法论坑（自我通道旁路、自指 vs 世界记忆混淆、冗余 latent 骗过消融）见 **`experiments/README.md`** 与 **`experiments/PROTOCOL.md`**；全部 verbatim 输出见 **`experiments/experiment_results.md`**。
 
+### v0.2 实测：时间连续自我（`experiments/v02/train_v02.py`，1200 iters × 3 seeds）
+
+```
+world                   agent        errH1   errH5  errH10   drift    sep   info  cfCorr   cfH10  cfErr10
+T1_self_persistent      Memory      0.0397  0.2662  0.5381   0.605  0.716  0.929   0.991   0.993    0.126
+T1_self_persistent      NoPersist   0.1173  1.0879  1.8568   0.622  0.559  0.455   0.960   0.972    0.237
+T1_self_persistent      NoLatent    0.1541  1.7057  2.8390     n/a    n/a    n/a   0.937   0.955    0.295
+T2_self_white           Memory      0.0249  0.0856  0.1139   0.743  0.579  0.003   0.941   0.957    0.292
+T2_self_white           NoPersist   0.0251  0.0855  0.1135   0.675  0.591  0.003   0.941   0.957    0.292
+T3_external_persistent  Memory      0.0252  0.1825  0.4179   0.869  0.615  0.457   0.838   0.835    0.554
+T3_external_persistent  NoPersist   0.0197  0.1797  0.4121   0.628  0.555  0.434   0.837   0.834    0.553
+```
+
+**三条结论**：
+
+1. **时间连续性只在「自因 + 被我的动作驱动」时付钱**（T1）：持久 latent 把 10 步预测误差从 1.857 压到 **0.538**，反事实误差从 0.233 压到 **0.117**。
+2. **「有持久隐藏变量」远远不够**（T3，与 T1 统计量完全相同、只有因果位置不同）：收益为零（0.4179 vs 0.4121）。
+3. **核心负面发现**：T1 与 T3 对智能体**全部可观测证据完全对称**——「我的动作是否驱动我的状态」这个差异，真实分支差在 T1 是 0.50→3.54、在 T3 **恒为 0.0000**，而它**只存在于因果图里**。所以任何纯行为判定的「这是不是一个自我」都被智能体可见信息**欠定**。
+
+（含一处公开的**自我纠正**：我们批评草稿的身份损失会退化成常量解，数学上成立但**没能做出来**——λ=20 时 latent 仍保有 `info`=0.942。详见 `experiment_results.md` §6。）
+
 ### 实测图（`experiments/prototype/visualize.py`）
 
 | 世界 C：latent ↔ agent **自身**隐藏状态 | 世界 B：latent ↔ 隐藏的**外部**驱动 |
@@ -110,6 +133,16 @@ D_false_agency           0.1102   0.1104    0.0002     0.0002   0.0150       n/a
 | `assets/` | 实测图（latent ↔ 隐藏变量） |
 | `references/README.md` | 文献与相关理论对照地图 |
 
+### v0.2 追加
+
+| 路径 | 内容 |
+|------|------|
+| `experiments/PROTOCOL_V02.md` | v0.2 协议：时间连续自我、三个世界 T1/T2/T3、五条判定标准、三处草稿修正 |
+| `experiments/v02/environment/` | T1（自因+动作驱动）/ T2（自因白噪声）/ T3（属于世界的持久驱动） |
+| `experiments/v02/agent/` | `Memory` / `NoPersist`（无持续性对照）/ `NoLatent` + 反退化指标模块 |
+| `experiments/v02/train_v02.py` | v0.2 主实验（含身份损失 `none/naive/contrastive` 消融） |
+| `experiments/v02/analysis/` | `identity_test.py`（含「死的 latent」对照）/ `counterfactual_test.py`（反事实分支） |
+
 ## 快速跑通
 
 ```bash
@@ -120,6 +153,10 @@ python experiments/code/simulation.py --b-ablation                 # 诊断：�
 pip install -r experiments/prototype/requirements.txt
 python experiments/prototype/train.py --iters 1500 --seeds 1,2,3    # 黑箱原型（PyTorch）
 python experiments/prototype/visualize.py --world C_self_relevant   # 出图（可选）
+
+python experiments/v02/train_v02.py --iters 1200 --seeds 1,2,3      # v0.2 主表（PyTorch）
+python experiments/v02/analysis/identity_test.py --world T1_self_persistent
+python experiments/v02/analysis/counterfactual_test.py
 ```
 
 受控实验**零依赖**（只用 NumPy）；原型需要 PyTorch（CPU 版够用）。环境：Python 3.11。

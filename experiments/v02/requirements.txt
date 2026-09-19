@@ -1,0 +1,11 @@
+# v0.2 (Temporal Self Model Emergence) requirements
+#
+#   pip install -r experiments/v02/requirements.txt
+#   python experiments/v02/train_v02.py --iters 1200 --seeds 1,2,3
+#
+# PyTorch CPU wheels are sufficient.  matplotlib is used only by the analysis
+# plots (optional).
+
+torch>=2.0
+numpy>=1.24
+matplotlib>=3.7

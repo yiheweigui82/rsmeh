@@ -102,6 +102,16 @@
       <div class="t">黑箱涌现原型</div>
       <div class="d">encoder→latent→decoder，4 个世界，训练时<strong>完全不知道 Self 存在</strong></div>
     </a>
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/blob/main/experiments/PROTOCOL_V02.md">
+      <div class="k">V0.2 · 时间连续自我</div>
+      <div class="t">协议：past → me → future</div>
+      <div class="d">三个世界 T1/T2/T3（统计量相同、只差因果位置）· 分层预测 + 反事实分支 · 五条判定标准</div>
+    </a>
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/tree/main/experiments/v02">
+      <div class="k">V0.2 · CODE</div>
+      <div class="t">时间连续自我实验</div>
+      <div class="d">Memory / NoPersist（无持续性对照）/ NoLatent + <code>identity_test.py</code> + <code>counterfactual_test.py</code></div>
+    </a>
     <a class="card" href="https://github.com/yiheweigui82/rsmeh">
       <div class="k">GITHUB</div>
       <div class="t">仓库 · 提 issue / PR</div>
@@ -121,6 +131,17 @@
   <p class="note">关键不对称：<b>误差大</b>不等于<b>逼出自我</b>。D 与 C 方差匹配、只差「有没有时间结构」；E 是全场误差最大者。
   两者都不产生自我表征 —— 触发条件是自因误差的<b>结构</b>，不是它的<b>大小</b>。
   「自我」不能用架构位置定义，只能用因果作用定义（消融实验）。</p>
+
+  <h2>v0.2：时间连续自我（已跑通）</h2>
+  <table>
+    <tr><th>世界</th><th>隐藏变量</th><th>我的动作能驱动它吗</th><th>实测 gainH10（持久 latent vs 无持续性）</th></tr>
+    <tr><td><b>T1</b></td><td>agent <b>自己的</b>状态（AR 0.92）</td><td><b>能</b></td><td><b>+2.30 vs +0.98</b>（误差 0.538 vs 1.857）</td></tr>
+    <tr><td><b>T2</b></td><td>自己的状态，<b>白噪声</b>（方差匹配）</td><td>能，但无时间结构</td><td>±0.00（<code>info</code>=0.003）</td></tr>
+    <tr><td><b>T3</b></td><td><b>属于世界的</b>持久驱动（与 T1 同动力学）</td><td><b>不能</b></td><td>±0.00（0.4179 vs 0.4121）</td></tr>
+  </table>
+  <p class="note">结论：时间连续性<b>只在「自因 + 被我的动作驱动」时才付钱</b>；「有持久隐藏变量」远远不够（T3 收益为零）。<br>
+  最尖锐的负面发现：T1 与 T3 对智能体<b>全部可观测证据完全对称</b>——真实的「我的动作是否推动我的状态」（分支差 0.50→3.54 vs 恒为 0.0000）<b>只存在于因果图里</b>，
+  所以任何纯行为的「这是不是一个自我」判定，都被智能体可见信息<b>欠定</b>。</p>
 
   <h2>一句话立场</h2>
   <p>
