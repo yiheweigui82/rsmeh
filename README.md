@@ -14,6 +14,23 @@ of itself — and then a model of *that* model?
 
 > **进度**：v0.1（自因误差 → 自我表征）✅ ｜ **v0.2（时间连续自我）✅** ｜ **v0.3（递归预测：我预测我将怎么预测）✅ 已跑通** ——三版全部附 verbatim 实测输出与判定状态：
 > `experiments/experiment_results.md` §5–§9（v0.2）、§10–§12（v0.3）；协议 `PROTOCOL.md` / `PROTOCOL_V02.md` / `PROTOCOL_V03.md`。
+>
+> **v0.5（多具身现实模型）✅** ——不同感官接口下的内部现实：共享核心 + 不可共享的私有内容。见 `experiments/v05/`、`experiment_results.md` §14–§16、`experiments/v05/README.md`。
+
+---
+
+## A deeper question
+
+If the self is a model created by prediction systems, then reality itself may also be
+a model created by the interaction between:
+
+- the universe
+- the sensors
+- the prediction architecture
+
+如果「我」是预测系统构造的模型，那么「现实」也许同样是三者交互的产物：
+宇宙、传感器、预测架构。`experiments/v05/` 把这句话做成了一个可证伪的实验：
+同一隐生成过程、三种感官接口、一个「没有共同因」的对照世界。
 
 ---
 
@@ -177,6 +194,17 @@ R3_visible_response   Rec              0.036      0.998     0.024    0.028      
 | `experiments/v03/train_v03.py` | 主入口：世界与 agent **逐步交织**（因果闭环），BPTT 覆盖整段 episode |
 | `experiments/v03/analysis/recursion_test.py` | 修好的递归测试：未来预测探针 + **NULL 对照** + `loop check`（世界对我的预测的响应是否可学） |
 
+### v0.5 追加
+
+| 路径 | 内容 |
+|------|------|
+| `experiments/v05/README.md` | v0.5 协议：具身现实假说、六处草稿修正、度量与判定标准、Limitations、哲学附录 |
+| `experiments/v05/environments/universe.py` | **一个宇宙**：共享隐因子联合生成全部模态的观测量；`shared` / `disjoint`（无共同因）同一开关 |
+| `experiments/v05/environments/{human,ai,abstract}_sensor_world.py` | 三种感官接口（**均不含共享隐因子的直接观测**） |
+| `experiments/v05/agents/embodiment_agent.py` | 预测下一时刻观测的具身 agent（非 autoencoder） |
+| `experiments/v05/train_v05.py` | 同一 episode 上训练四个 agent（含同接口对照 `human_b`） |
+| `experiments/v05/compare_reality.py` | 现实比较：CCA 对齐 / 翻译 / 隐藏因子恢复 / 预测能力，含 NULL 与 `disjoint` 证伪列 |
+
 ## 快速跑通
 
 ```bash
@@ -191,6 +219,12 @@ python experiments/prototype/visualize.py --world C_self_relevant   # 出图（�
 python experiments/v02/train_v02.py --iters 1200 --seeds 1,2,3      # v0.2 主表（PyTorch）
 python experiments/v02/analysis/identity_test.py --world T1_self_persistent
 python experiments/v02/analysis/counterfactual_test.py
+
+python experiments/v03/train_v03.py --iters 900 --seeds 1,2,3       # v0.3 递归预测
+python experiments/v03/analysis/recursion_test.py --world R1_prediction_loop
+
+python experiments/v05/train_v05.py --iters 700 --seeds 1,2,3       # v0.5 多具身现实
+python experiments/v05/compare_reality.py                          # shared vs disjoint
 ```
 
 受控实验**零依赖**（只用 NumPy）；原型需要 PyTorch（CPU 版够用）。环境：Python 3.11。

@@ -122,6 +122,16 @@
       <div class="t">递归预测实验</div>
       <div class="d">Rec / NoSelfPred（去二阶头重训）/ NoRec（无持续性）+ <code>recursion_test.py</code>（含被证伪的旧指标对照）</div>
     </a>
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/blob/main/experiments/v05/README.md">
+      <div class="k">V0.5 · 多具身现实</div>
+      <div class="t">不同感官，不同世界？</div>
+      <div class="d">一个宇宙 / 三种感官接口 · <code>shared</code>（有共同因）vs <code>disjoint</code>（无共同因）证伪对照</div>
+    </a>
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/tree/main/experiments/v05">
+      <div class="k">V0.5 · CODE</div>
+      <div class="t">现实比较实验</div>
+      <div class="d"><code>universe.py</code> 共享隐因子 · 三种传感器接口 · <code>compare_reality.py</code>（CCA / 留出翻译 / 隐藏因子恢复）</div>
+    </a>
     <a class="card" href="https://github.com/yiheweigui82/rsmeh">
       <div class="k">GITHUB</div>
       <div class="t">仓库 · 提 issue / PR</div>
@@ -164,6 +174,22 @@
   </table>
   <p class="note">→ 在这套操作化下，<b>「预测自己的预测」不是独立的信息需求，而是被第一阶预测吸收了</b>。
   协议写明本版<b>不主张</b>什么，并给出「递归要有非冗余价值」所需的三个条件（供下一版攻击）。</p>
+
+  <h2>v0.5：多具身现实模型（已跑通）</h2>
+  <table>
+    <tr><th>度量</th><th><code>shared</code>（有共同因）</th><th><code>disjoint</code>（同统计量、无共同因）</th></tr>
+    <tr><td>跨具身<b>留出翻译</b> R²（A 能否理解 B 的现实）</td><td><b>+0.26 ~ +0.41</b>（NULL ≈ −0.01）</td><td><b>−0.02 ~ −0.04</b></td></tr>
+    <tr><td>跨具身 CCA 对齐（平均典型相关）</td><td>0.75 – 0.79</td><td>0.29 – 0.35（<b>地板很高</b>）</td></tr>
+    <tr><td>同感官对照 <code>human ↔ human_b</code>（对齐上限）</td><td><b>0.995</b></td><td>0.995</td></tr>
+    <tr><td>恢复隐藏共享因子 R²（「更接近现实」的操作化）</td><td>0.665 – 0.670（三种具身<b>无差别</b>）</td><td><b>0.012 – 0.014</b></td></tr>
+    <tr><td>恢复<b>驱动自己传感器的那个块</b> R²</td><td>0.666 – 0.670</td><td><b>0.651 – 0.668</b>（仍在很好地建模自己的世界）</td></tr>
+  </table>
+  <p class="note">结论：<b>「现实」由世界与感官接口共同决定</b>——有共同因时三种非常不同的接口收敛到同一隐藏结构；
+  而统计量相同、只去掉共同因后，这个结构<b>消失</b>（0.013），每个 agent 却仍在完美建模<b>自己的</b>世界（0.66）。
+  两个数字缺一不可：后者才让前者有意义。<br>
+  <b>方法论</b>：明显的 CCA 指标<b>不干净</b>——无共同因时它仍有 ~0.3 的地板（两个 latent 都编码了同类自相关结构）；
+  能通过证伪检验的是<b>留出翻译</b>。<b>对齐 ≠ 共享</b>，与前几版同构（连续 ≠ 自我、可解码 ≠ 在使用、二阶内容 ≠ 二阶需求）。<br>
+  <b>本实验不能</b>说明客观现实不存在、意识涌现、或 AI 有体验：这里的「现实」由构造定义为隐生成过程。</p>
 
   <h2>一句话立场</h2>
   <p>

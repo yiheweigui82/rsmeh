@@ -565,3 +565,143 @@ sufficient trace in the current observation — e.g. it acts on a *hidden* part 
 the future, or with a delay that only my own error history can bridge. In the
 present design the visible state absorbs my own influence immediately, which is
 why every honest probe comes back "redundant".
+
+---
+
+# v0.5 — Multi-Embodiment Reality Model
+
+## 14. Per-agent: prediction ability vs reality recovery
+
+`python experiments/v05/train_v05.py --iters 700 --seeds 1,2,3` (normalised
+next-step error, mean over 3 seeds):
+
+```
+agent        normalised predErr (MSE / var of its own sensors)
+human                                                   0.1787
+ai                                                      0.1742
+abstract                                                0.1827
+human_b                                                 0.1783
+```
+
+`python experiments/v05/compare_reality.py --iters 700` (seed 1):
+
+```
+=== 1. per-agent: prediction ability vs reality recovery ===
+agent     shared predErr shared sharedR2 shared ownBlock disjoint predErr disjoint sharedR2 disjoint ownBlock
+human             0.1750         0.666          0.666        0.1803         0.013          0.667
+ai                0.1804         0.665          0.665        0.1723         0.014          0.660
+abstract          0.1826         0.670          0.670        0.1818         0.014          0.651
+human_b           0.1740         0.666          0.666        0.1806         0.012          0.668
+
+   sanity control (latent -> a PRIVATE factor that is not mine):
+   human    own +1.00 / other +0.01 (shared)  own +1.00 / other +0.01 (disjoint)
+   ai       own +1.00 / other +0.01 (shared)  own +1.00 / other +0.02 (disjoint)
+   abstract  own +1.00 / other +0.01 (shared)  own +1.00 / other +0.01 (disjoint)
+```
+
+Reading:
+
+- **Every embodiment recovers the hidden shared factors about equally**
+  (`sharedR2` 0.665–0.670) and **predicts about equally well**
+  (0.174–0.183 vs a persistence baseline of 0.462). Interface *structure* —
+  coarse linear vs wider private bandwidth vs a tanh-nonlinear mixing — makes no
+  measurable difference. In particular the abstract interface is **not** closer to
+  reality: the fix of not handing it the hidden factors (PROTOCOL §3) removed the
+  tautology, and what is left is equality.
+- **Criterion C4 (dissociation) is NOT observed**: no embodiment is "more powerful
+  but less reality-tracking". We must state why this is a weak test as designed:
+  all three interfaces were given the **same shared bandwidth** (2 channels each),
+  so equal recovery is partly by construction. Testing "does higher intelligence
+  mean closer to reality?" requires varying the *shared* bandwidth, which this
+  experiment does not do. What it *does* show is invariance: the shared core is
+  recovered regardless of how it is mixed, as long as the bandwidth suffices.
+- **The `disjoint` control is decisive.** With no common cause, `sharedR2`
+  collapses to 0.012–0.014 (there is nothing shared to find) while `ownBlockR2`
+  stays at 0.65–0.67: each agent still models **its own** world well. That is the
+  clearest possible demonstration of the difference between "modelling your world"
+  and "sharing a world" — and it is a control the original draft did not have.
+- The private-factor probes are specific: `ownPrivateR2` = 1.00,
+  `otherPrivateR2` = 0.01–0.02 in both modes, so "alignment" numbers are not
+  artefacts of the probes leaking across embodiments.
+
+## 15. Cross-embodiment alignment and translation
+
+```
+=== 2. cross-embodiment alignment (mean canonical correlation) ===
+pair                       CCA    NULL    top1   |        CCA    NULL    top1
+                                        shared   |                   disjoint
+human <-> ai             0.771   0.062   0.994   0.312   0.065   0.567
+human <-> abstract       0.748   0.055   0.992   0.287   0.057   0.527
+ai <-> abstract          0.792   0.054   0.987   0.349   0.053   0.643
+human <-> human_b (control)   0.995      --      --   0.995      --      --
+
+=== 3. translation: can A understand B's reality? (held-out R^2) ===
+A -> B                     shared     NULL   disjoint     NULL
+human -> ai                 0.257   -0.009     -0.021   -0.006
+human -> abstract           0.265   -0.008     -0.030   -0.007
+ai -> abstract              0.405   -0.010     -0.036   -0.006
+```
+
+Three results, in order of how much they can be trusted:
+
+1. **Translation is the clean metric.** A linear map fitted on half the
+   trajectories from one embodiment's latent to another's scores **+0.26 to +0.41**
+   when a common cause exists and **−0.02 to −0.04** when it does not (NULL
+   ≈ −0.01). "Can A understand B's reality?" has a sharp, falsifiable answer here:
+   yes exactly when they share causes.
+2. **CCA is a relative signal, not a categorical one.** It separates the modes
+   (0.75–0.79 vs 0.29–0.35) — a factor of ~2.4 — but its floor is high: with no
+   common cause at all, two latents still share ~0.3 of canonical correlation,
+   because both encode the *same kind of autocorrelated process*. An earlier,
+   undertrained version of this table reported 0.51 in the control world, which
+   would have been easy to misread as "alignment". Reported as the reason we lead
+   with translation instead.
+3. **Different embodiments really do have different internal realities about a
+   common world**: cross-embodiment alignment 0.75–0.79 sits well below the
+   same-interface ceiling **0.995**, and each agent dedicates ~all of its
+   private-factor content to channels the others cannot see (`ownPrivateR2` 1.00
+   vs `otherPrivateR2` 0.01). The shared core is real, and so is the part that is
+   not shared.
+
+## 16. v0.5 conclusion and criteria status
+
+| criterion (`v05/README.md` §判定标准) | status |
+|---|---|
+| C1 different embodiments → different internal realities | **accepted** — cross-embodiment 0.75–0.79 vs same-interface 0.995; private content 1.00 vs 0.01 |
+| C2 a shared core nevertheless exists | **accepted** — held-out translation +0.26…+0.41 (NULL ≈ −0.01); alignment ≫ NULL |
+| C3 the falsifier (`disjoint`) must not light up | **passed** — translation ≤ 0, alignment collapses 0.77 → 0.31, `sharedR2` 0.666 → 0.013, while `ownBlockR2` stays 0.66 |
+| C4 prediction power dissociates from reality recovery | **not observed** — both are equal across embodiments; and the test was weak as designed (equal shared bandwidth) |
+
+**What v0.5 establishes.**
+
+1. **Reality, in the only sense this experiment can define it, is jointly
+   determined by the world and the interface.** With a common cause present, three
+   very different interfaces converge on the same hidden structure (0.67 recovered,
+   translation positive); with the *same statistics but no common cause*, that
+   structure disappears (0.013) even though each agent continues to model its own
+   world perfectly (0.66). Both numbers are needed: the second is what makes the
+   first mean something.
+2. **The interface's *structure* barely matters; its *bandwidth* presumably does**
+   — though we did not vary the latter, so "presumably" is as far as this run
+   goes.
+3. **"Which agent sees the true world?" is answerable — as "who recovers the
+   shared causes that the task makes necessary"** — and here the honest answer is
+   *nobody has an advantage*, because nobody's interface was starved. The draft's
+   framing ("the question may be misformulated") is too strong: the question is
+   well-posed once "reality" is defined as the generative process, and it just has
+   to be *measured against that ground truth* rather than argued about.
+4. **A methodological lesson, the same shape as v0.1–v0.3**: "alignment" is not
+   "sharing". CCA, the obvious metric, was contaminated by shared low-order
+   statistics (floor ~0.3 with no common cause); the metric that survived the
+   falsifier was held-out *translation*. Every layer of this repository has
+   produced the same lesson: *continuity ≠ self* (v0.2), *decodability ≠ use*
+   (v0.1), *design-decidable ≠ agent-decidable* (v0.2), *second-order content ≠
+   second-order need* (v0.3), *alignment ≠ shared reality* (v0.5).
+
+**Scope limits (stated in `v05/README.md`, repeated here because they matter):**
+this does **not** show that objective reality does not exist, that consciousness
+emerges, or that AI experiences anything. "Reality" is **defined here as the
+generative process**, i.e. by construction; the experiment therefore cannot speak
+about the real world at all — it can only demonstrate what "many projections of
+one thing" looks like computationally (an alignable core plus unshareable private
+content). The 道德经 appendix is labelled as an interpretation, not a result.
