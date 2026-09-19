@@ -18,10 +18,16 @@ of itself — and then a model of *that* model?
 
 点链接直接打开，无需安装任何东西：
 
-- 🌐 **首页入口**：https://yiheweigui82.github.io/rsmeh/
-- 🌐 **完整理论（中文）**：https://yiheweigui82.github.io/rsmeh/theory/THEORY.md
-- 🌐 **学术论文（英文）**：https://yiheweigui82.github.io/rsmeh/paper/main.md
-- 🌐 **实验协议**：https://yiheweigui82.github.io/rsmeh/experiments/PROTOCOL.md
+- 🌐 **首页入口（导航页）**：https://yiheweigui82.github.io/rsmeh/
+- 📖 **完整理论（中文，渲染版）**：https://github.com/yiheweigui82/rsmeh/blob/main/theory/THEORY.md
+- 📄 **学术论文（英文，渲染版）**：https://github.com/yiheweigui82/rsmeh/blob/main/paper/main.md
+- 🧪 **实验总纲**：https://github.com/yiheweigui82/rsmeh/blob/main/experiments/README.md
+- 📊 **实测结果（verbatim）**：https://github.com/yiheweigui82/rsmeh/blob/main/experiments/experiment_results.md
+- 📋 **实验协议**：https://github.com/yiheweigui82/rsmeh/blob/main/experiments/PROTOCOL.md
+- ❓ **开放问题 / 攻击面**：https://github.com/yiheweigui82/rsmeh/blob/main/theory/QUESTIONS.md
+
+> 文档链接指向 **GitHub 渲染视图**（表格、公式、目录都能正常显示）。
+> 本仓库带 `.nojekyll`，Pages 上的 `.md` 是**原样文本**、浏览器打不开，所以正文一律走渲染链接；Pages 只作为门面首页。
 
 ---
 

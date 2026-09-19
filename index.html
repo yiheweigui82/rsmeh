@@ -62,30 +62,45 @@
 
   <h2>读什么</h2>
   <div class="cards">
-    <a class="card" href="theory/THEORY.md">
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/blob/main/theory/THEORY.md">
       <div class="k">理论 · 中文</div>
       <div class="t">完整理论（从「为什么」到「道」）</div>
       <div class="d">核心问题 · 定义 · 归因压力 · Stage 0–5 · 与既有理论对照 · SMP 形式化 · 边界与攻击面</div>
     </a>
-    <a class="card" href="paper/main.md">
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/blob/main/paper/main.md">
       <div class="k">PAPER · ENGLISH</div>
       <div class="t">学术论文正文</div>
       <div class="d">Abstract · 最小形式化 · 三情形分解 · 实验方案与结果 · 参考文献</div>
     </a>
-    <a class="card" href="experiments/PROTOCOL.md">
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/blob/main/experiments/README.md">
+      <div class="k">EXPERIMENTS</div>
+      <div class="t">实验总纲</div>
+      <div class="d">三条件 H1–H3 · 实验矩阵 A–E · 四个指标 · 两条方法论约束 · 证伪标准 · 路线图</div>
+    </a>
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/blob/main/experiments/experiment_results.md">
+      <div class="k">RESULTS · VERBATIM</div>
+      <div class="t">实测结果与解读</div>
+      <div class="d">两个实验的全部原始输出 · 关键结论：触发自我表征的是自因误差的<strong>时间结构</strong>，不是误差大小</div>
+    </a>
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/blob/main/experiments/PROTOCOL.md">
       <div class="k">PROTOCOL</div>
       <div class="t">实验协议与判定标准</div>
-      <div class="d">条件 A/B/C · 四个指标 · 什么算支持、什么算证伪 · 防作弊规则 · 我们踩过的坑</div>
+      <div class="d">条件 A/B/C/D/E · 指标定义 · 什么算支持、什么算证伪 · 防作弊规则 · 我们踩过的坑（含一个失败的递归指标）</div>
     </a>
-    <a class="card" href="theory/QUESTIONS.md">
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/blob/main/theory/QUESTIONS.md">
       <div class="k">OPEN QUESTIONS</div>
       <div class="t">攻击面清单</div>
       <div class="d">概念 · 实验 · 理论关系 · 哲学 —— 欢迎逐条来拆</div>
     </a>
-    <a class="card" href="experiments/code/simulation.py">
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/blob/main/experiments/code/simulation.py">
       <div class="k">CODE · NUMPY</div>
-      <div class="t">可运行 toy 实验</div>
-      <div class="d">纯 NumPy 零依赖，含 BPTT 梯度检查（对照有限差分 ~1e-7）</div>
+      <div class="t">受控 toy 实验（纯 NumPy 零依赖）</div>
+      <div class="d">五条件 A–E · 因果消融 + 归因探针 · 含 BPTT 梯度检查（对照有限差分 ~1e-7）</div>
+    </a>
+    <a class="card" href="https://github.com/yiheweigui82/rsmeh/tree/main/experiments/prototype">
+      <div class="k">PROTOTYPE · PYTORCH</div>
+      <div class="t">黑箱涌现原型</div>
+      <div class="d">encoder→latent→decoder，4 个世界，训练时<strong>完全不知道 Self 存在</strong></div>
     </a>
     <a class="card" href="https://github.com/yiheweigui82/rsmeh">
       <div class="k">GITHUB</div>
@@ -96,12 +111,15 @@
 
   <h2>核心预测（最容易被打倒的地方）</h2>
   <table>
-    <tr><th>条件</th><th>环境</th><th>预测</th></tr>
-    <tr><td><b>A</b> 纯预测</td><td>低维世界，误差可被世界模型完全消除</td><td>不产生自我模型</td></tr>
-    <tr><td><b>B</b> 外部复杂度</td><td>高维世界 + 不可归约的<b>外部</b>噪声</td><td>长出更大的世界模型；<b>不</b>产生自我模型</td></tr>
-    <tr><td><b>C</b> 自因不可归约误差</td><td>不可归约、且由系统<b>自身隐藏漂移</b>造成的误差</td><td>出现指向自身的隐结构（自我表征涌现）</td></tr>
+    <tr><th>条件</th><th>环境</th><th>实测 selfGain</th></tr>
+    <tr><td><b>A</b> 纯预测</td><td>低维世界，误差可被世界模型完全消除</td><td>−0.0000（不产生）</td></tr>
+    <tr><td><b>B</b> 外部复杂度</td><td>高维世界 + 不可归约的<b>外部</b>噪声</td><td>−0.0000（世界模型变强，自我不出现）</td></tr>
+    <tr><td><b>C</b> 自因不可归约误差</td><td>不可归约、且由系统<b>自身隐藏漂移</b>造成的误差（有<b>时间结构</b>）</td><td><b>+0.1416</b>（自我表征涌现，自编码 R²=0.90）</td></tr>
+    <tr><td><b>D</b> 自因白噪声</td><td>与 C <b>方差匹配</b>的自因误差，但无时间结构</td><td>−0.0001（<b>什么都不产生</b>）</td></tr>
+    <tr><td><b>E</b> 假能动性</td><td><b>误差最大</b>（0.2483），但动作对结果毫无影响</td><td>−0.0008（<b>什么都不产生</b>）</td></tr>
   </table>
-  <p class="note">关键不对称：<b>误差大</b>不等于<b>逼出自我</b>。B 的误差持续存在却属于世界，因此不驱动自我建模。
+  <p class="note">关键不对称：<b>误差大</b>不等于<b>逼出自我</b>。D 与 C 方差匹配、只差「有没有时间结构」；E 是全场误差最大者。
+  两者都不产生自我表征 —— 触发条件是自因误差的<b>结构</b>，不是它的<b>大小</b>。
   「自我」不能用架构位置定义，只能用因果作用定义（消融实验）。</p>
 
   <h2>一句话立场</h2>
