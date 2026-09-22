@@ -2,6 +2,10 @@
 
 **RSMEH**
 
+> **这不是真理，这是一个模型。名 ≠ 道。**
+>
+> This is not the truth. This is a model. The name is not the Way.
+
 > **生命最初预测世界；当世界无法解释所有误差时，生命开始预测自己；**
 > **当预测自己的过程再次成为预测对象，「我」便从模型中涌现。**
 
@@ -42,6 +46,7 @@ a model created by the interaction between:
 
 - 🌐 **首页入口（导航页）**：https://yiheweigui82.github.io/rsmeh/
 - 📖 **完整理论（中文，渲染版）**：https://github.com/yiheweigui82/rsmeh/blob/main/theory/THEORY.md
+- 🧭 **误差归因理论（哲学 / 伦理推论层，渲染版）**：https://github.com/yiheweigui82/rsmeh/blob/main/theory/ERROR_ATTRIBUTION_THEORY.md
 - 📄 **学术论文（英文，渲染版）**：https://github.com/yiheweigui82/rsmeh/blob/main/paper/main.md
 - 🧪 **实验总纲**：https://github.com/yiheweigui82/rsmeh/blob/main/experiments/README.md
 - 📊 **实测结果（verbatim）**：https://github.com/yiheweigui82/rsmeh/blob/main/experiments/experiment_results.md
@@ -188,6 +193,7 @@ visible  Plastic        0.507    0.012    0.167     0.806   0.088    0.001   0.9
 |------|------|
 | `theory/THEORY.md` | 完整理论（中文）：核心问题、定义、归因压力、Stage 0–5、与既有理论对照、SMP 形式化、道、AI 含义、边界 |
 | `theory/QUESTIONS.md` | 开放问题 / **攻击面清单**（概念 · 实验 · 理论关系 · 哲学） |
+| `theory/ERROR_ATTRIBUTION_THEORY.md` | 误差归因理论：归因分叉、伦理空间 0–6 层、终极三问、难题速查 —— **哲学 / 规范性推论层，不是实验结论** |
 | `paper/main.md` | 学术论文正文（英文）——含最小数学形式化与实验结果 |
 | `experiments/README.md` | 实验总纲：三条件 H1–H3、实验矩阵（A–E）、四个指标、**两条方法论约束**、证伪标准、路线图 |
 | `experiments/PROTOCOL.md` | 受控实验协议：五条件 A/B/C/D/E、指标定义、判定标准、防作弊规则、RMG 的失败记录 |
@@ -255,16 +261,17 @@ python experiments/v05/compare_reality.py                          # shared vs d
 ## 验证（Tests）
 
 ```bash
-python -m unittest discover -s tests -v      # 18 tests, ~19 s, 仅标准库
+python -m unittest discover -s tests -v      # 30 tests, ~19 s, 仅标准库
 ```
 
-没有 CI 配置；测试用 stdlib `unittest`（只依赖 NumPy / PyTorch，与实验一致）。它们锁住的是**文档里写明的声明**，
+没有 CI 配置；测试用 stdlib `unittest`（实验类测试依赖 NumPy / PyTorch，与实验一致；文档一致性测试纯标准库）。它们锁住的是**文档里写明的声明**，
 不是「代码能跑」——断言一破，就是某条声称破：
 
 | 测试文件 | 锁住什么 |
 |---|---|
 | `tests/test_plastic_self.py` | v0.4 的**三条设计条件**（隐藏调制器影响我的**未来**、不影响我**此刻**、拆掉快通路后完全无关）、世界模式语义（`static` 的 m≡0、`visible` 暴露 m）、快权重**不发散**（初版 40 步内 1e17）、常量目标不给分、以及一次短训练必须复现「二阶头赢过平凡基线 + `mInfo` 超过地板」 |
 | `tests/test_multi_embodiment.py` | v0.5 的宇宙结构（`shared` 一个共同因 / `disjoint` 无）、**没有任何具身直接观测共享隐因子**、CCA 落在 [0,1]、误差 helper 按时间对齐（展平顺序那个坑 = 16/9 精确值）、以及 `shared` 对齐 / `disjoint` 不对齐的证伪对照 |
+| `tests/test_theory_docs.py` | 哲学层（`theory/ERROR_ATTRIBUTION_THEORY.md`）的**文档一致性**：免责声明句「这不是真理，这是一个模型。名 ≠ 道。」在理论文档 / README / 首页三处都在、且在 README 里排在核心陈述之前；三个入口的渲染链接不断；伦理空间恰好 0–6 七级且首尾为「民 / 无我」；归因分叉是二元的（内→「我」诞生→觉醒，外→神明诞生→放弃觉醒）；术语表 12 个承重词条齐全；定位说明仍写明**不是实验结论**。**不含任何实验断言。** |
 
 ## 与《意识 Bug 假说》的关系
 
@@ -295,3 +302,4 @@ python -m unittest discover -s tests -v      # 18 tests, ~19 s, 仅标准库
 学术/作品署名：**仇小昌 (Chou Xiaochang)** ｜ 仓库维护：[@yiheweigui82](https://github.com/yiheweigui82)
 
 本文档与代码采用 **CC BY 4.0**（可自由使用、修改、分发，需署名）。
+
